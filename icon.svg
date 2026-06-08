@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="120" fill="#0D0E14"/>
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#7EB8A4" stroke-width="6" opacity="0.3"/>
+  <circle cx="256" cy="256" r="130" fill="none" stroke="#7EB8A4" stroke-width="4" opacity="0.5"/>
+  <!-- Leaf / plant icon -->
+  <path d="M256 160 C256 160 180 200 180 280 C180 330 215 360 256 360 C297 360 332 330 332 280 C332 200 256 160 256 160Z" fill="#7EB8A4" opacity="0.85"/>
+  <path d="M256 200 C256 200 210 230 210 290 C210 320 230 345 256 345" fill="#3D8B75" opacity="0.6"/>
+  <line x1="256" y1="360" x2="256" y2="400" stroke="#7EB8A4" stroke-width="6" stroke-linecap="round"/>
+  <!-- Sound waves -->
+  <path d="M170 240 Q155 256 170 272" fill="none" stroke="#A89FD8" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+  <path d="M150 225 Q125 256 150 287" fill="none" stroke="#A89FD8" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+  <path d="M342 240 Q357 256 342 272" fill="none" stroke="#A89FD8" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+  <path d="M362 225 Q387 256 362 287" fill="none" stroke="#A89FD8" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+</svg>
