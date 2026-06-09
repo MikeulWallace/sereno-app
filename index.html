@@ -623,56 +623,31 @@ function loadPreset(p){
 
 async function generateProg(){
   const btn=document.getElementById('wizBtn');
-  if(btn){btn.disabled=true;btn.textContent='⏳ Génération en cours...';}
-  const modLabel=wizData.module==='mix'?'mixte (mental + motivation + sport)':MODULES[wizData.module]?.name||wizData.module;
-  const prompt=`Génère un programme de coaching personnalisé de ${wizData.duration} jours en JSON.
-Domaine : ${modLabel}
-Objectif : ${wizData.goal||'Amélioration générale du bien-être'}
-Contexte : ${wizData.context||'Non précisé'}
-Niveau : ${wizData.level||'intermédiaire'}
-
-Retourne UNIQUEMENT ce JSON (sans markdown) :
-{
-  "name": "Nom du programme (court, inspirant)",
-  "tagline": "Sous-titre motivant",
-  "days": [
-    {
-      "day": 1,
-      "theme": "Thème du jour (ex: Ancrage & présence)",
-      "description": "Description courte du jour (2 phrases)",
-      "exercises": [
-        {"icon":"emoji","name":"Nom exercice","duration":"5 min","description":"Description détaillée de l'exercice (3-4 phrases avec instructions précises)"}
-      ],
-      "journalPrompt": "Question de réflexion pour le journal du soir"
-    }
-  ]
-}
-Chaque jour doit avoir 2-3 exercices variés et progressifs. Les exercices doivent être concrets, pratiques, avec des instructions claires.`;
-
+  if(btn){btn.disabled=true;btn.textContent='⏳ Génération...';}
   try{
+    const modLabel={sport:'sport mental',boxe:'boxe mental',mental:'bien-être mental',motiv:'motivation',mix:'mixte'}[wizData.module]||'sport mental';
     const res=await fetch('/.netlify/functions/chat',{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:3000,
-        system:'Tu es un expert en coaching mental et préparation mentale. Réponds UNIQUEMENT en JSON valide, sans aucun texte avant ou après, sans markdown.',
-        messages:[{role:'user',content:prompt}]})
+      body:JSON.stringify({
+        model:'llama-3.3-70b-versatile',
+        max_tokens:3000,
+        system:'Expert coaching mental. JSON valide complet sur une seule ligne. Utilise uniquement emojis simples: 🥊 🧘 💪 🎯 🔥 ⚡ ✍️ 🏆. Pas de ZWJ emojis.',
+        messages:[{role:'user',content:`Programme coaching mental 3 jours. Domaine: ${modLabel}. Objectif: ${wizData.goal||'performance mentale'}. Niveau: ${wizData.level||'intermediaire'}. JSON: {"name":"string","tagline":"string","days":[{"day":1,"theme":"string","description":"string","exercises":[{"icon":"🥊","name":"string","duration":"5 min","description":"string"},{"icon":"🧘","name":"string","duration":"5 min","description":"string"}],"journalPrompt":"string"},{"day":2,"theme":"string","description":"string","exercises":[{"icon":"💪","name":"string","duration":"5 min","description":"string"},{"icon":"🎯","name":"string","duration":"5 min","description":"string"}],"journalPrompt":"string"},{"day":3,"theme":"string","description":"string","exercises":[{"icon":"🔥","name":"string","duration":"5 min","description":"string"},{"icon":"⚡","name":"string","duration":"5 min","description":"string"}],"journalPrompt":"string"}]}`}]
+      })
     });
     const data=await res.json();
     const raw=data.content?.map(b=>b.text||'').join('')||'{}';
-    const clean=raw.replace(/```json|```/g,'').trim();
-    const generated=JSON.parse(clean);
-    prog={
-      ...generated,
-      module:wizData.module,duration:wizData.duration,
-      startDate:new Date().toISOString(),
-      currentDay:1,completed:false,continued:false,
-      completedDays:[],
-      journals:{},
-      goal:wizData.goal,level:wizData.level
-    };
+    const i1=raw.indexOf('{');const i2=raw.lastIndexOf('}');
+    if(i1===-1||i2===-1)throw new Error('Pas de JSON');
+    const jsonStr=raw.substring(i1,i2+1).replace(/️/g,'').replace(/‍/g,'');
+    const generated=JSON.parse(jsonStr);
+    if(!generated.days||generated.days.length===0)throw new Error('Vide');
+    prog={...generated,module:wizData.module,duration:wizData.duration,startDate:new Date().toISOString(),currentDay:1,completed:false,continued:false,completedDays:[],journals:{},goal:wizData.goal,level:wizData.level};
     saveAndRender();
   }catch(e){
-    showToast('Erreur de génération. Vérifiez votre connexion.');
-    if(btn){btn.disabled=false;btn.textContent='✨ GÉNÉRER MON PROGRAMME';}
+    console.error('generateProg:',e.message);
+    showToast('Erreur: '+e.message.substring(0,50));
+    if(btn){btn.disabled=false;btn.textContent='✨ GÉNÉRER';}
   }
 }
 
